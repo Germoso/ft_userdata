@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "FreqTrade: Debug Strategy",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/freqtrade/main.py",
+            "args": [
+                "trade",
+                "--strategy", "RandomEntry",
+                "--config", "${workspaceFolder}/user_data/config.json",
+                "--db-url", "sqlite:///user_data/tradesv3.sqlite"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "FreqTrade: Backtest",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/freqtrade/main.py",
+            "args": [
+                "backtesting",
+                "--strategy", "RandomEntry",
+                "--config", "${workspaceFolder}/user_data/config.json",
+                "--timerange", "20210101-20210201"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}
