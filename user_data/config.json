@@ -1,7 +1,7 @@
 
 {
     "$schema": "https://schema.freqtrade.io/schema.json",
-    "max_open_trades": 4,
+    "max_open_trades": -1,
     "stake_currency": "USDT",
     "stake_amount": 100,
     "min_stake": 500,

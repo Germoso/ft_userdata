@@ -14,14 +14,14 @@ class RSI_Shorteable_Coin_Alerts(IStrategy):
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (dataframe['rsi'] > 70),
+            (dataframe['rsi'] > 60),
             'enter_long'] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (dataframe['rsi'] > 30),
+            (dataframe['rsi'] > 20),
             'exit_long'] = 1
 
         return dataframe
