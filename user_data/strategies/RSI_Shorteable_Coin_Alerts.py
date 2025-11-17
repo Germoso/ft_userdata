@@ -2,7 +2,7 @@ from freqtrade.strategy import IStrategy
 from pandas import DataFrame
 import talib.abstract as ta
 
-class RSI_Strategy(IStrategy):
+class RSI_Shorteable_Coin_Alerts(IStrategy):
     # set the initial stoploss to -10%
     stoploss = -1
 
