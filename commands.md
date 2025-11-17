@@ -1,9 +1,11 @@
 ### BACKTESTING
 
 ```jsx
-freqtrade backtesting --strategy SampleStrategy --timeframe 5m --timerange 20240101-20250301
+docker compose run --rm freqtrade backtesting --strategy BollingerReversionStrategy --timeframe 1m --timerange 20240101-20250301
 
-docker compose run --rm freqtrade backtesting --strategy RSIShortStrategy --timeframe 5m --timerange 20250101-20250601
+docker compose run --rm freqtrade backtesting --strategy MartingaleDcaStrategy --timeframe 5m --timerange 20240101-20250101
+
+docker compose run --rm freqtrade backtesting --strategy SimpleStrategy --timeframe 5m --timerange 20240101-20250301
 
 freqtrade backtesting --strategy TrendFollowingStrategy --timeframe 5m --timerange 20250101-20250601
 
@@ -21,8 +23,13 @@ docker compose run -d --name freqtrade_bt_ui -p 127.0.0.1:8080:8080 freqtrade we
 
 ```jsx
 freqtrade download-data --days 365 --timeframes 1m 5m 15m 1h 4h 1d
-docker compose run --rm freqtrade download-data --timeframe 5m --timerange 20240101-20250301
+docker compose run --rm freqtrade download-data --timeframes 1h 5m --timerange 20240101-20250301
 // Descargar todos los pares
+
+docker compose run --rm freqtrade download-data --timeframe 1d --timerange 20240101-20250101
+
+docker compose run --rm freqtrade download-data --timeframe 5m --timerange 20240101-20250101
+
 docker compose run --rm freqtrade download-data --exchange binance --pairs ".*/USDT" --timeframe 5m --timerange 20240101-20250101
 ```
 
@@ -33,7 +40,7 @@ freqtrade hyperopt --hyperopt-loss SharpeHyperOptLoss --strategy HourBasedStrate
 
 docker compose run --rm freqtrade hyperopt --hyperopt-loss ProfitDrawDownHyperOptLoss --strategy RSIShortStrategy -e 50 --timerange 20250101-20250301 --timeframe 5m
 
- 
+
 
 // MOSTRAR TODOS LOS RESULTADOS DE UN HYPEROPT RESULT
 docker compose run --rm freqtrade hyperopt-show

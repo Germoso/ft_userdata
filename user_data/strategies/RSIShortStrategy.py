@@ -34,7 +34,7 @@ from technical import qtpylib
 class RSIShortStrategy(IStrategy):
     """
     Estrategia de trading que se especializa en posiciones cortas basadas en el indicador RSI.
-    
+
     Esta estrategia:
     - Opera exclusivamente con posiciones cortas
     - Entra al mercado cuando el RSI indica condiciones de sobrecompra (RSI > 70)
@@ -49,7 +49,7 @@ class RSIShortStrategy(IStrategy):
     can_short: bool = True
 
     minimal_roi = {
-        "0": 0.1 
+        "0": 0.1
     }
 
     position_adjustment_enable = True
@@ -64,7 +64,7 @@ class RSIShortStrategy(IStrategy):
     use_exit_signal = True
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
-    
+
     startup_candle_count: int = 30
 
     order_types = {
@@ -87,14 +87,14 @@ class RSIShortStrategy(IStrategy):
 
     # Hyperopt parameters for entry
     short_rsi = IntParameter(low=60, high=90, default=70, space="buy", optimize=True, load=True)
-    short_rsi_decreasing = IntParameter(low=1, high=10, default=2, space="buy", optimize=True, load=True)    
+    short_rsi_decreasing = IntParameter(low=1, high=10, default=2, space="buy", optimize=True, load=True)
 
     # Hyperopt parameters for position adjustment
     max_dca_adjustments = IntParameter(low=1, high=10, default=5, space="buy", optimize=True, load=True)
-    stoploss_threshold = DecimalParameter(low=-1.0, high=-0.1, default=-1.0, space="sell", optimize=True, load=True)
-    dca_threshold_1 = DecimalParameter(low=-10, high=010, default=-1, space="buy", optimize=True, load=True)
-    dca_threshold_2 = DecimalParameter(low=-10, high=10, default=-2, space="buy", optimize=True, load=True)
-    dca_threshold_3 = DecimalParameter(low=-10, high=10, default=-4, space="buy", optimize=True, load=True)
+    stoploss_threshold = DecimalParameter(low=-1.0, high=-0.1, default=-0.1, space="sell", optimize=True, load=True)
+    dca_threshold_1 = DecimalParameter(low=-10, high=10, default=-0.05, space="buy", optimize=True, load=True)
+    dca_threshold_2 = DecimalParameter(low=-10, high=10, default=-0.1, space="buy", optimize=True, load=True)
+    dca_threshold_3 = DecimalParameter(low=-10, high=10, default=-0.2, space="buy", optimize=True, load=True)
     dca_multiplier_1 = DecimalParameter(low=1.0, high=3.0, default=1.0, space="buy", optimize=True, load=True)
     dca_multiplier_2 = DecimalParameter(low=1.0, high=3.0, default=2.0, space="buy", optimize=True, load=True)
     dca_multiplier_3 = DecimalParameter(low=1.0, high=3.0, default=2.0, space="buy", optimize=True, load=True)
@@ -105,7 +105,7 @@ class RSIShortStrategy(IStrategy):
         dataframe['rsi_prev_2'] = dataframe['rsi'].shift(2)
         dataframe['rsi_decreasing'] = (dataframe['rsi'] < dataframe['rsi_prev_1']).astype('int')
         dataframe['rsi_increasing'] = (dataframe['rsi'] > dataframe['rsi_prev_1']).astype('int')
-        
+
         dataframe['ema_slow'] = ta.EMA(dataframe, timeperiod=200)
         dataframe['ema_fast'] = ta.EMA(dataframe, timeperiod=5)
 
@@ -113,7 +113,7 @@ class RSIShortStrategy(IStrategy):
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
-        
+
         conditions.append(dataframe['rsi'] > self.short_rsi.value)
         conditions.append(dataframe['rsi_decreasing'] > 0)
         conditions.append(dataframe['volume'] > 0)
@@ -134,7 +134,7 @@ class RSIShortStrategy(IStrategy):
         # Close position if profit is below stoploss threshold
         if current_profit <= self.stoploss_threshold.value:
             return trade.stake_amount * -1
-        
+
         # Limit the number of DCA adjustments
         if trade.nr_of_successful_entries >= self.max_dca_adjustments.value:
             return None
@@ -146,5 +146,5 @@ class RSIShortStrategy(IStrategy):
             return trade.stake_amount * self.dca_multiplier_2.value
         elif current_profit <= self.dca_threshold_1.value:
             return trade.stake_amount * self.dca_multiplier_1.value
-        
+
         return None
