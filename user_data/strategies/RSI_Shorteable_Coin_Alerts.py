@@ -5,7 +5,7 @@ import talib.abstract as ta
 class RSI_Shorteable_Coin_Alerts(IStrategy):
     # set the initial stoploss to -10%
     stoploss = -1
-
+    can_short = True
     minimal_roi = {"0": 1}
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:

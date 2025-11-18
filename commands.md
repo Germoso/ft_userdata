@@ -5,7 +5,7 @@ docker compose run --rm freqtrade backtesting --strategy BollingerReversionStrat
 
 docker compose run --rm freqtrade backtesting --strategy MartingaleDcaStrategy --timeframe 5m --timerange 20240101-20250101
 
-docker compose run --rm freqtrade backtesting --strategy SimpleStrategy --timeframe 5m --timerange 20240101-20250301
+docker compose run --rm freqtrade backtesting --strategy RSI_Shorteable_Coin_Alerts --timeframe 5m --timerange 20240101-20250301
 
 freqtrade backtesting --strategy TrendFollowingStrategy --timeframe 5m --timerange 20250101-20250601
 
