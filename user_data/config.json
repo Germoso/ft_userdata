@@ -42,9 +42,13 @@
         "ccxt_config": {},
         "ccxt_async_config": {},
         "pair_whitelist": [
-            // "MELANIA/USDT:USDT",
+            "MELANIA/USDT:USDT",
+            "LA/USDT:USDT",
+            "LAYER/USDT:USDT",
             // "ZEREBRO/USDT:USDT",
-            "BTC/USDT:USDT",
+            "HOLO/USDT:USDT",
+            "LINEA/USDT:USDT",
+            // "BTC/USDT:USDT",
             // ".*/USDT:USDT"
         ],
         "pair_blacklist": [
