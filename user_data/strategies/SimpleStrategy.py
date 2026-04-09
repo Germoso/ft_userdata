@@ -97,6 +97,9 @@ class SimpleStrategy(IStrategy):
         dataframe['ema_long'] = dataframe['ema_100']
         dataframe['ema_short'] = dataframe['ema_50']
 
+        # RSI
+        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -104,19 +107,22 @@ class SimpleStrategy(IStrategy):
         bull_trend = dataframe['ema_50'] > dataframe['ema_100']
         bear_trend = dataframe['ema_50'] < dataframe['ema_100']
 
-        # Long: (Bull Trend + crossover(EMA 5, EMA 10)) OR (crossover(EMA 50, EMA 100))
+        # Long: (EMA Logic) OR (RSI > 60) OR (RSI < 20)
         dataframe.loc[
             (
                 (bull_trend & qtpylib.crossed_above(dataframe['ema_5'], dataframe['ema_10'])) |
-                qtpylib.crossed_above(dataframe['ema_50'], dataframe['ema_100'])
+                qtpylib.crossed_above(dataframe['ema_50'], dataframe['ema_100']) |
+                (dataframe['rsi'] < 40)
             ),
             'enter_long'] = 1
 
-        # Short: (Bear Trend + crossunder(EMA 5, EMA 10)) OR (crossunder(EMA 50, EMA 100))
+        # Short: (EMA Logic) OR (RSI > 80) OR (RSI < 40)
+        # Using 80/40 as mirrored/standard levels for Short since 60/20 were used for Long
         dataframe.loc[
             (
                 (bear_trend & qtpylib.crossed_below(dataframe['ema_5'], dataframe['ema_10'])) |
-                qtpylib.crossed_below(dataframe['ema_50'], dataframe['ema_100'])
+                qtpylib.crossed_below(dataframe['ema_50'], dataframe['ema_100']) |
+                (dataframe['rsi'] > 60)
             ),
             'enter_short'] = 1
 
