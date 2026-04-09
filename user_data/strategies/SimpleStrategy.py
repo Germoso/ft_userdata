@@ -55,7 +55,7 @@ class SimpleStrategy(IStrategy):
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
 
-    startup_candle_count: int = 30
+    startup_candle_count: int = 100
 
     order_types = {
         "entry": "limit",
@@ -67,7 +67,12 @@ class SimpleStrategy(IStrategy):
     order_time_in_force = {"entry": "GTC", "exit": "GTC"}
 
     plot_config = {
-        "main_plot": {},
+        "main_plot": {
+            "ema_5": {"color": "#00ff00"},    # Lime
+            "ema_10": {"color": "#0000ff"},   # Blue
+            "ema_50": {"color": "#ffa500"},   # Orange
+            "ema_100": {"color": "#ff0000"},  # Red
+        },
         "subplots": {
             "RSI": {
                 "rsi": {"color": "red"},
@@ -76,29 +81,48 @@ class SimpleStrategy(IStrategy):
     }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe['ema_long'] = ta.EMA(dataframe, timeperiod=200)
-        dataframe['ema_short'] = ta.EMA(dataframe, timeperiod=100)
-        dataframe['ema_filter'] = ta.EMA(dataframe, timeperiod=1000) # Esto se puede usar para sacar stop loss dinámico si el preico cierra por encima de esa ema
+        # EMAs requested for "EMA Strategy PRO" conversion
+        dataframe['ema_5'] = ta.EMA(dataframe, timeperiod=5)
+        dataframe['ema_10'] = ta.EMA(dataframe, timeperiod=10)
+        dataframe['ema_50'] = ta.EMA(dataframe, timeperiod=50)
+        dataframe['ema_100'] = ta.EMA(dataframe, timeperiod=100)
+        
+        # We also need a way to check for crossovers easily
+        # (Though we can use qtpylib directly in populate_entry_trend)
+        
+        # Keep old names if necessary for some logic, 
+        # but the request implies a full replacement of logic.
+        dataframe['ema_long'] = dataframe['ema_100']
+        dataframe['ema_short'] = dataframe['ema_50']
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        conditions = []
-        conditions.append(dataframe['ema_long']> dataframe['ema_short'])
-        if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'enter_short'] = 1
+        # Trend Conditions
+        bull_trend = dataframe['ema_50'] > dataframe['ema_100']
+        bear_trend = dataframe['ema_50'] < dataframe['ema_100']
+
+        # Long: (Bull Trend + crossover(EMA 5, EMA 10)) OR (crossover(EMA 50, EMA 100))
+        dataframe.loc[
+            (
+                (bull_trend & qtpylib.crossed_above(dataframe['ema_5'], dataframe['ema_10'])) |
+                qtpylib.crossed_above(dataframe['ema_50'], dataframe['ema_100'])
+            ),
+            'enter_long'] = 1
+
+        # Short: (Bear Trend + crossunder(EMA 5, EMA 10)) OR (crossunder(EMA 50, EMA 100))
+        dataframe.loc[
+            (
+                (bear_trend & qtpylib.crossed_below(dataframe['ema_5'], dataframe['ema_10'])) |
+                qtpylib.crossed_below(dataframe['ema_50'], dataframe['ema_100'])
+            ),
+            'enter_short'] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        conditions = []
-        conditions.append(dataframe['ema_long']< dataframe['ema_short'])
-        if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_short'] = 1
+        # Exit signals can be added here if needed. 
+        # For now, we rely on ROI and Stoploss.
         return dataframe
 
     def adjust_trade_position(self, trade: Trade, current_time: datetime, current_rate: float,

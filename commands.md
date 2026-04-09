@@ -5,7 +5,7 @@ docker compose run --rm freqtrade backtesting --strategy BollingerReversionStrat
 
 docker compose run --rm freqtrade backtesting --strategy MartingaleDcaStrategy --timeframe 5m --timerange 20240101-20250101
 
-docker compose run --rm freqtrade backtesting --strategy SimpleStrategy --timeframe 5m --timerange 20250301-20251101
+docker compose run --rm freqtrade backtesting --strategy SimpleStrategy --timeframe 5m --timerange 20240101-20250111
 
 freqtrade backtesting --strategy TrendFollowingStrategy --timeframe 5m --timerange 20250101-20250601
 
@@ -23,7 +23,9 @@ docker compose run -d --name freqtrade_bt_ui -p 127.0.0.1:8080:8080 freqtrade we
 
 ```jsx
 freqtrade download-data --days 365 --timeframes 1m 5m 15m 1h 4h 1d
-docker compose run --rm freqtrade download-data --timeframes 5m 1h --timerange 20240101-20250111
+
+docker compose run --rm freqtrade download-data --timeframes 5m --timerange 20240101-20250111
+
 // Descargar todos los pares
 
 docker compose run --rm freqtrade download-data --timeframe 5m 1h --timerange 20250301-20251101
