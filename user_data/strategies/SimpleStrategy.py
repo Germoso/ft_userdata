@@ -57,6 +57,8 @@ class SimpleStrategy(IStrategy):
 
     startup_candle_count: int = 100
 
+    timeframe = "5m"
+
     order_types = {
         "entry": "limit",
         "exit": "limit",
